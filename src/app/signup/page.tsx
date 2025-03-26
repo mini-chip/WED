@@ -1,202 +1,159 @@
 "use client";
 
-import { supabase } from "@/lib/supabase";
-import Image from "next/image";
-import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { RegisterSchemaType, registerSchema } from "./registerSchema";
-import { useState } from "react";
+import { z } from "zod";
+import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase";
+import Logo from "@/images/logo.svg";
+import Button from "@/component/button/page";
+const signupSchema = z
+  .object({
+    email: z.string().email("유효한 이메일을 입력해주세요."),
+    username: z.string().min(3, "아이디는 최소 3자 이상이어야 합니다."),
+    password: z.string().min(6, "비밀번호는 최소 6자 이상이어야 합니다."),
+    confirmPassword: z.string(),
+    nickname: z.string().min(2, "닉네임은 최소 2자 이상이어야 합니다.")
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "비밀번호가 일치하지 않습니다.",
+    path: ["confirmPassword"]
+  });
+
+type SignupFormData = z.infer<typeof signupSchema>;
 
 export default function SignUpPage() {
   const router = useRouter();
-  const [signupError, setSignupError] = useState<string | null>(null);
   const {
     register,
     handleSubmit,
-    setError,
     formState: { errors }
-  } = useForm<RegisterSchemaType>({
-    resolver: zodResolver(registerSchema),
-    mode: "onBlur"
+  } = useForm<SignupFormData>({
+    resolver: zodResolver(signupSchema)
   });
 
-  const onSubmit = async (data: RegisterSchemaType) => {
-    const { email, password, nickname } = data;
-
+  const onSubmit = async (data: SignupFormData) => {
     try {
-      const { data: signUpData, error: signUpError } =
-        await supabase.auth.signUp({
-          email,
-          password
-        });
-
-      if (signUpError) {
-        setSignupError(`Sign Up Error: ${signUpError.message}`);
-        return;
-      }
-
-      const user = signUpData.user;
-      if (!user) {
-        setSignupError("회원가입 실패. 다시 시도해주세요.");
-        return;
-      }
-
-      const { error: profileError } = await supabase.from("profiles").insert([
-        {
-          id: user.id,
-          nickname: nickname
+      const { email, username, password, nickname } = data;
+      const { data: userData, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: { username, nickname }
         }
-      ]);
+      });
 
-      if (profileError) {
-        setSignupError(`Profile Insert Error: ${profileError.message}`);
+      if (error) {
+        console.error("회원가입 에러:", error.message);
+        alert(`회원가입 실패: ${error.message}`);
         return;
       }
 
+      console.log("회원가입 성공:", userData);
+      alert("회원가입이 완료되었습니다!");
       router.push("/");
-    } catch (error: any) {
-      setSignupError(`Unexpected Error: ${error.message}`);
+    } catch (err) {
+      console.error("다시 시도해주세요:", err);
+      alert("회원가입 중 문제가 발생했습니다.");
+    }
+  };
+
+  const handleGoogleSignUp = async () => {
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`
+        }
+      });
+
+      if (error) {
+        console.error("Google 로그인 에러:", error.message);
+        alert(`Google 로그인 실패: ${error.message}`);
+      }
+    } catch (err) {
+      console.error("예상치 못한 에러:", err);
+      alert("Google 로그인 중 문제가 발생했습니다.");
     }
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100 px-4 sm:px-6 lg:px-8">
+    <div className="flex flex-col items-center min-h-screen p-4">
+      <Logo width={100} height={100} />
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="w-full max-w-[350px] bg-white p-4 sm:p-6 md:p-8 rounded-lg shadow-lg flex flex-col items-center gap-4 sm:gap-5 md:gap-6"
+        className="flex flex-col gap-3 w-full max-w-xs"
       >
-        <div className="flex flex-col items-center w-20 h-auto sm:w-24 relative">
-          <div className="relative w-full h-20 sm:h-24">
-            <Image src="/logo.svg" alt="Logo" width={100} height={100} />
-          </div>
-          {/* <h2 className="text-center font-['Lucida_Sans'] text-2xl sm:text-3xl font-extrabold mt-2 sm:mt-4">
-            회원가입
-          </h2> */}
-        </div>
-
-        <div className="w-full">
-          <input
-            {...register("email")}
-            type="email"
-            className="w-full px-3 py-2 sm:px-4 sm:py-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-teal-500 placeholder-gray-400 text-sm sm:text-base"
-            placeholder="이메일"
-          />
-          {errors.email && (
-            <p className="text-red-500 text-xs sm:text-sm mt-1">
-              {errors.email.message}
-            </p>
-          )}
-        </div>
-
-        <div className="w-full">
-          <input
-            {...register("userId")}
-            type="text"
-            className="w-full px-3 py-2 sm:px-4 sm:py-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-teal-500 placeholder-gray-400 text-sm sm:text-base"
-            placeholder="아이디"
-          />
-          {errors.userId && (
-            <p className="text-red-500 text-xs sm:text-sm mt-1">
-              {errors.userId.message}
-            </p>
-          )}
-        </div>
-
-        {/* 비밀번호 */}
-        <div className="w-full">
-          <input
-            {...register("password")}
-            type="password"
-            className="w-full px-3 py-2 sm:px-4 sm:py-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-teal-500 placeholder-gray-400 text-sm sm:text-base"
-            placeholder="비밀번호"
-          />
-          {errors.password && (
-            <p className="text-red-500 text-xs sm:text-sm mt-1">
-              {errors.password.message}
-            </p>
-          )}
-        </div>
-
-        {/* 비밀번호 확인 */}
-        <div className="w-full">
-          <input
-            {...register("passwordCheck")}
-            type="password"
-            className="w-full px-3 py-2 sm:px-4 sm:py-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-teal-500 placeholder-gray-400 text-sm sm:text-base"
-            placeholder="비밀번호 확인"
-          />
-          {errors.passwordCheck && (
-            <p className="text-red-500 text-xs sm:text-sm mt-1">
-              {errors.passwordCheck.message}
-            </p>
-          )}
-        </div>
-
-        {/* 닉네임 */}
-        <div className="w-full">
-          <input
-            {...register("nickname")}
-            type="text"
-            className="w-full px-3 py-2 sm:px-4 sm:py-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-teal-500 placeholder-gray-400 text-sm sm:text-base"
-            placeholder="닉네임"
-          />
-          {errors.nickname && (
-            <p className="text-red-500 text-xs sm:text-sm mt-1">
-              {errors.nickname.message}
-            </p>
-          )}
-        </div>
-
-        {/* 이용약관 동의 */}
-        <div className="w-full flex items-center gap-2">
-          <input
-            {...register("agree")}
-            type="checkbox"
-            className="h-3 w-3 sm:h-4 sm:w-4 text-teal-500 border-gray-300 rounded focus:ring-teal-500"
-          />
-          <label className="text-gray-700 text-xs sm:text-sm font-['Lucida_Sans']">
-            서비스 이용약관에 동의합니다.
-          </label>
-          {errors.agree && (
-            <p className="text-red-500 text-xs sm:text-sm">
-              {errors.agree.message}
-            </p>
-          )}
-        </div>
-
-        {/* 가입 버튼 */}
-        <button
-          type="submit"
-          className="w-full py-2 px-4 bg-teal-500 text-white rounded-full font-['Lucida_Sans'] font-medium text-sm sm:text-base hover:bg-teal-600 transition-colors shadow-md hover:shadow-none"
-        >
-          가입
-        </button>
-
-        {/* 에러 메시지 */}
-        {signupError && (
-          <p className="text-red-500 text-xs sm:text-sm mt-2">{signupError}</p>
+        <input
+          type="email"
+          placeholder="이메일"
+          {...register("email")}
+          className="p-2 rounded-3xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
+        />
+        {errors.email && (
+          <p className="text-red-500 text-sm">{errors.email.message}</p>
         )}
 
-        {/* 로그인 링크 */}
-        <p className="text-center text-gray-500 text-xs sm:text-sm font-['Lucida_Sans']">
+        <input
+          type="text"
+          placeholder="아이디"
+          {...register("username")}
+          className="p-2 rounded-3xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
+        />
+        {errors.username && (
+          <p className="text-red-500 text-sm">{errors.username.message}</p>
+        )}
+
+        <input
+          type="password"
+          placeholder="비밀번호"
+          {...register("password")}
+          className="p-2 rounded-3xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
+        />
+        {errors.password && (
+          <p className="text-red-500 text-sm">{errors.password.message}</p>
+        )}
+
+        <input
+          type="password"
+          placeholder="비밀번호 확인"
+          {...register("confirmPassword")}
+          className="p-2 rounded-3xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
+        />
+        {errors.confirmPassword && (
+          <p className="text-red-500 text-sm">
+            {errors.confirmPassword.message}
+          </p>
+        )}
+
+        <input
+          type="text"
+          placeholder="닉네임"
+          {...register("nickname")}
+          className="p-2 rounded-3xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
+        />
+        {errors.nickname && (
+          <p className="text-red-500 text-sm">{errors.nickname.message}</p>
+        )}
+
+        <Button type="submit" className="bg-green-500 hover:text-green-500">
+          가입
+        </Button>
+
+        <p className="text-center text-gray-600">
           이미 계정이 있으신가요?{" "}
-          <span
-            className="text-teal-500 underline underline-offset-2 font-bold cursor-pointer"
-            onClick={() => router.push("/login")}
-          >
+          <a href="/signin" className="text-blue-500 hover:underline">
             로그인
-          </span>
+          </a>
         </p>
 
-        <div className="w-full flex flex-col gap-3 sm:gap-4 mt-4 sm:mt-5">
-          <button
-            type="button"
-            className="flex items-center justify-center gap-2 p-2 sm:p-3 rounded-full border-2 border-gray-500 shadow-lg hover:shadow-md transition-shadow font-['Lucida_Sans'] text-xs sm:text-sm"
-          >
-            <span>Google로 가입</span>
-          </button>
-        </div>
+        <Button
+          type="button"
+          onClick={handleGoogleSignUp}
+          className="p-2 bg-blue-600 text-white rounded-3xl hover:bg-blue-700 transition-colors"
+        >
+          Google로 가입
+        </Button>
       </form>
     </div>
   );

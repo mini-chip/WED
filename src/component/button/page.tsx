@@ -1,11 +1,27 @@
-'use client'
-
-import React from 'react'
+import React, { ReactNode } from "react";
 
 interface ButtonProps {
-    children: React.ReactNode
+  children: ReactNode;
+  onClick?: () => void;
+  type?: "button" | "submit" | "reset";
+  className?: string;
 }
 
-export default function Button({ children }: ButtonProps) {
-    return <button className="py-2 px-4 rounded-md bg-yellow text-gray-700 hover:bg-yellow-500">{children}</button>
-}
+const Button: React.FC<ButtonProps> = ({
+  children,
+  onClick,
+  type = "button",
+  className = ""
+}) => {
+  return (
+    <button
+      type={type}
+      onClick={onClick}
+      className={`custom-button ${className}`}
+    >
+      <span>{children}</span>
+    </button>
+  );
+};
+
+export default Button;
