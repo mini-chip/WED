@@ -29,6 +29,9 @@ const config: Config = {
       },
       transitionDuration: {
         400: "400ms"
+      },
+      borderRadius: {
+        "10px": "10px"
       }
     }
   },

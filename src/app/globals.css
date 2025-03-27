@@ -84,23 +84,6 @@ footer a:hover {
   color: #66b2ff;
 }
 
-button {
-  display: inline-block;
-  padding: 0.5rem 1rem;
-  font-size: 1rem;
-  font-weight: bold;
-  color: #ffffff;
-  background-color: #007bff;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-button:hover {
-  background-color: #0056b3;
-}
-
 button:disabled {
   background-color: #cccccc;
   cursor: not-allowed;
@@ -114,14 +97,14 @@ textarea {
   margin-bottom: 1rem;
   font-size: 1rem;
   border: 1px solid #ccc;
-  border-radius: 4px;
+  border-radius: 10px;
 }
 
 input:focus,
 select:focus,
 textarea:focus {
   outline: none;
-  border-color: #007bff;
+  border-color: #4f9e5b;
 }
 
 .product-card {
@@ -185,7 +168,7 @@ textarea:focus {
   }
 }
 
-.custom-button {
+/* .custom-button {
   position: relative;
   display: flex;
   justify-content: center;
@@ -231,7 +214,7 @@ textarea:focus {
 .custom-button:hover span {
   color: #4f9e5b;
   animation: scaleUp 0.3s ease-in-out;
-}
+} */
 
 @keyframes scaleUp {
   0% {
@@ -242,5 +225,19 @@ textarea:focus {
   }
   100% {
     transform: scale(1);
+  }
+}
+
+@layer components {
+  .btn {
+    @apply relative flex justify-center items-center rounded-[10px] bg-[#4f9e5b]  font-montserrat shadow-2xl overflow-hidden cursor-pointer border-none group;
+  }
+
+  .btn span {
+    @apply text-center no-underline w-full px-[25px] py-2 text-white text-lg font-bold tracking-[0.3em] z-20 transition-all duration-300 ease-in-out group-hover:text-[#4f9e5b] group-hover:animate-scaleUp;
+  }
+
+  .btn-after {
+    @apply w-0 h-full bg-[#ffd401] absolute transition-all duration-400 ease-in-out right-0 group-hover:w-full group-hover:left-0 group-hover:right-auto;
   }
 }

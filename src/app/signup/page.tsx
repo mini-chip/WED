@@ -6,7 +6,9 @@ import { z } from "zod";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import Logo from "@/images/logo.svg";
-import Button from "@/component/button/page";
+import Button from "@/component/buttons/page";
+import GoogleButton from "@/component/oauthButton/page";
+import { useEffect } from "react";
 const signupSchema = z
   .object({
     email: z.string().email("유효한 이메일을 입력해주세요."),
@@ -31,7 +33,17 @@ export default function SignUpPage() {
   } = useForm<SignupFormData>({
     resolver: zodResolver(signupSchema)
   });
-
+  useEffect(() => {
+    const checkSession = async () => {
+      const {
+        data: { session }
+      } = await supabase.auth.getSession();
+      if (session) {
+        router.push("/");
+      }
+    };
+    checkSession();
+  }, [router]);
   const onSubmit = async (data: SignupFormData) => {
     try {
       const { email, username, password, nickname } = data;
@@ -55,25 +67,6 @@ export default function SignUpPage() {
     } catch (err) {
       console.error("다시 시도해주세요:", err);
       alert("회원가입 중 문제가 발생했습니다.");
-    }
-  };
-
-  const handleGoogleSignUp = async () => {
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback`
-        }
-      });
-
-      if (error) {
-        console.error("Google 로그인 에러:", error.message);
-        alert(`Google 로그인 실패: ${error.message}`);
-      }
-    } catch (err) {
-      console.error("예상치 못한 에러:", err);
-      alert("Google 로그인 중 문제가 발생했습니다.");
     }
   };
 
@@ -147,13 +140,7 @@ export default function SignUpPage() {
           </a>
         </p>
 
-        <Button
-          type="button"
-          onClick={handleGoogleSignUp}
-          className="p-2 bg-blue-600 text-white rounded-3xl hover:bg-blue-700 transition-colors"
-        >
-          Google로 가입
-        </Button>
+        <GoogleButton> Google 계정으로 가입</GoogleButton>
       </form>
     </div>
   );
