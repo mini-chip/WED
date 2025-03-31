@@ -118,6 +118,9 @@ textarea:focus {
     transform: scale(1);
   }
 }
+@theme {
+  --radius-2xl: 1.5rem;
+}
 
 .custom-button {
   position: relative;

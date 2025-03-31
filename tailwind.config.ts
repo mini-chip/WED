@@ -12,7 +12,8 @@ const config: Config = {
         background: "var(--background)",
         foreground: "var(--foreground)",
         navy: "#183153",
-        yellow: "#ffd401"
+        yellow: "#ffd401",
+        green: "#4f9e5b"
       },
       fontFamily: {
         "open-sans": ["Open Sans", "sans-serif"],
@@ -30,9 +31,6 @@ const config: Config = {
       },
       transitionDuration: {
         400: "400ms"
-      },
-      borderRadius: {
-        "10px": "10px"
       }
     }
   },

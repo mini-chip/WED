@@ -6,9 +6,11 @@ import { z } from "zod";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import Logo from "@/images/logo.svg";
-import Button from "@/component/buttons/page";
-import GoogleButton from "@/component/oauthButton/page";
+import Button from "@/app/component/buttons/page";
+import GoogleButton from "@/app/component/oauthButton/page";
 import { useEffect } from "react";
+import Image from "next/image";
+
 const signupSchema = z
   .object({
     email: z.string().email("유효한 이메일을 입력해주세요."),
