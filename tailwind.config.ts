@@ -15,7 +15,8 @@ const config: Config = {
         yellow: "#ffd401"
       },
       fontFamily: {
-        "open-sans": ["Open Sans", "sans-serif"]
+        "open-sans": ["Open Sans", "sans-serif"],
+        montserrat: ["Montserrat", "sans-serif"]
       },
       animation: {
         scaleUp: "scaleUp 0.3s ease-in-out"

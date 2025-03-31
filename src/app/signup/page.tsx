@@ -81,7 +81,7 @@ export default function SignUpPage() {
           type="email"
           placeholder="이메일"
           {...register("email")}
-          className="p-2 rounded-3xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
+          className="p-2  border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
         />
         {errors.email && (
           <p className="text-red-500 text-sm">{errors.email.message}</p>
@@ -91,7 +91,7 @@ export default function SignUpPage() {
           type="text"
           placeholder="아이디"
           {...register("username")}
-          className="p-2 rounded-3xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
+          className="p-2  border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
         />
         {errors.username && (
           <p className="text-red-500 text-sm">{errors.username.message}</p>
@@ -101,7 +101,7 @@ export default function SignUpPage() {
           type="password"
           placeholder="비밀번호"
           {...register("password")}
-          className="p-2 rounded-3xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
+          className="p-2  border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
         />
         {errors.password && (
           <p className="text-red-500 text-sm">{errors.password.message}</p>
@@ -111,7 +111,7 @@ export default function SignUpPage() {
           type="password"
           placeholder="비밀번호 확인"
           {...register("confirmPassword")}
-          className="p-2 rounded-3xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
+          className="p-2  border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
         />
         {errors.confirmPassword && (
           <p className="text-red-500 text-sm">
@@ -123,7 +123,7 @@ export default function SignUpPage() {
           type="text"
           placeholder="닉네임"
           {...register("nickname")}
-          className="p-2 rounded-3xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
+          className="p-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
         />
         {errors.nickname && (
           <p className="text-red-500 text-sm">{errors.nickname.message}</p>

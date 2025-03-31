@@ -1,6 +1,5 @@
 import React, { ReactNode } from "react";
-import Image from "next/image";
-import { supabase } from "@/lib/supabase";
+
 interface ButtonProps {
   children: ReactNode;
   onClick?: () => void;
@@ -15,9 +14,12 @@ const Button: React.FC<ButtonProps> = ({
   className = ""
 }) => {
   return (
-    <button type={type} onClick={onClick} className={`btn ${className}`}>
-      <span className="btn-span">{children}</span>
-      <div className="btn-after"></div>
+    <button
+      type={type}
+      onClick={onClick}
+      className={`custom-button ${className}`}
+    >
+      <span>{children}</span>
     </button>
   );
 };

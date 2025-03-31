@@ -97,7 +97,7 @@ textarea {
   margin-bottom: 1rem;
   font-size: 1rem;
   border: 1px solid #ccc;
-  border-radius: 10px;
+  border-radius: 1rem;
 }
 
 input:focus,
@@ -107,7 +107,66 @@ textarea:focus {
   border-color: #4f9e5b;
 }
 
-.product-card {
+@keyframes scaleUp {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(0.95);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.custom-button {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 10px;
+  background: #4f9e5b;
+  font-family: "Montserrat", sans-serif;
+  box-shadow: 0px 6px 24px 0px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  cursor: pointer;
+  border: none;
+}
+
+.custom-button:after {
+  content: " ";
+  width: 0%;
+  height: 100%;
+  background: #ffd401;
+  position: absolute;
+  transition: all 0.4s ease-in-out;
+  right: 0;
+}
+
+.custom-button:hover::after {
+  right: auto;
+  left: 0;
+  width: 100%;
+}
+
+.custom-button span {
+  text-align: center;
+  text-decoration: none;
+  width: 100%;
+  padding: 8px 25px;
+  color: #fff;
+  font-size: 1.125em;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  z-index: 20;
+  transition: all 0.3s ease-in-out;
+}
+
+.custom-button:hover span {
+  color: #4f9e5b;
+  animation: scaleUp 0.3s ease-in-out;
+}
+/* .product-card {
   background-color: #ffffff;
   border: 1px solid #ddd;
   border-radius: 8px;
@@ -166,78 +225,4 @@ textarea:focus {
   .product-card .product-info .price {
     font-size: 1.2rem;
   }
-}
-
-/* .custom-button {
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border-radius: 10px;
-  background: #4f9e5b;
-  font-family: "Montserrat", sans-serif;
-  box-shadow: 0px 6px 24px 0px rgba(0, 0, 0, 0.2);
-  overflow: hidden;
-  cursor: pointer;
-  border: none;
-}
-
-.custom-button:after {
-  content: " ";
-  width: 0%;
-  height: 100%;
-  background: #ffd401;
-  position: absolute;
-  transition: all 0.4s ease-in-out;
-  right: 0;
-}
-
-.custom-button:hover::after {
-  right: auto;
-  left: 0;
-  width: 100%;
-}
-
-.custom-button span {
-  text-align: center;
-  text-decoration: none;
-  width: 100%;
-  padding: 8px 25px;
-  color: #fff;
-  font-size: 1.125em;
-  font-weight: 700;
-  letter-spacing: 0.3em;
-  z-index: 20;
-  transition: all 0.3s ease-in-out;
-}
-
-.custom-button:hover span {
-  color: #4f9e5b;
-  animation: scaleUp 0.3s ease-in-out;
 } */
-
-@keyframes scaleUp {
-  0% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(0.95);
-  }
-  100% {
-    transform: scale(1);
-  }
-}
-
-@layer components {
-  .btn {
-    @apply relative flex justify-center items-center rounded-[10px] bg-[#4f9e5b]  font-montserrat shadow-2xl overflow-hidden cursor-pointer border-none group;
-  }
-
-  .btn span {
-    @apply text-center no-underline w-full px-[25px] py-2 text-white text-lg font-bold tracking-[0.3em] z-20 transition-all duration-300 ease-in-out group-hover:text-[#4f9e5b] group-hover:animate-scaleUp;
-  }
-
-  .btn-after {
-    @apply w-0 h-full bg-[#ffd401] absolute transition-all duration-400 ease-in-out right-0 group-hover:w-full group-hover:left-0 group-hover:right-auto;
-  }
-}
