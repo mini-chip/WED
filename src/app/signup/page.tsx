@@ -90,16 +90,6 @@ export default function SignUpPage() {
         )}
 
         <input
-          type="text"
-          placeholder="아이디"
-          {...register("username")}
-          className="p-2  border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
-        />
-        {errors.username && (
-          <p className="text-red-500 text-sm">{errors.username.message}</p>
-        )}
-
-        <input
           type="password"
           placeholder="비밀번호"
           {...register("password")}
