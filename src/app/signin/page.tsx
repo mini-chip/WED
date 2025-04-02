@@ -1,57 +1,75 @@
-'use client'
-import { createClient } from '@supabase/supabase-js'
+"use client";
 
-const supabaseUrl = process.env.SUPABASE_URL
-const supabaseKey = process.env.SUPABASE_KEY
+import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase";
+import Logo from "@/images/logo.svg";
+import Button from "@/app/component/buttons/page";
+import GoogleButton from "@/app/component/oauthButton/page";
+import { useState } from "react";
 
-import Image from 'next/image'
-import { useState } from 'react'
+export default function SignUpPage() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState(null);
+  const router = useRouter();
 
-export default function SigInPage() {
-    const [email, setEmail] = useState('')
-    const [password, setPassword] = useState('')
+  const hanleSignIn = async () => {
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
+      if (error) {
+        alert(error.message);
+      } else {
+        router.push("/");
+      }
+    } catch (error) {
+      console.error("로그인 에러:", error);
+      alert("로그인 실패");
+    }
+  };
+  return (
+    <div className="flex flex-col justify-center items-center min-h-screen p-4">
+      <Logo width={100} height={100} />
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          hanleSignIn();
+        }}
+        className="flex flex-col gap-3 w-full max-w-xs"
+      >
+        <input
+          type="email"
+          placeholder="이메일"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          className="p-2  border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
+        />
 
-    return (
-        <div className="flex items-center justify-center min-h-screen bg-gray-100">
-            <form className="flex flex-col items-center bg-white p-10 rounded-lg shadow-lg space-y-8 w-full max-w-sm">
-                {/* 로고 */}
-                <div className="flex justify-center">
-                    <Image src="/images/logo.svg" alt="logo" width={150} height={150} />
-                </div>
+        <input
+          type="password"
+          placeholder="비밀번호"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          className="p-2  border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
+        />
+        {error && <p className="text-red-500 text-sm">{error}</p>}
+        <Button type="submit" className="bg-green-500 hover:text-green-500">
+          로그인
+        </Button>
 
-                {/* 이메일 입력 */}
-                <div className="w-full">
-                    <label htmlFor="email" className="block text-gray-700 font-medium mb-2">
-                        이메일
-                    </label>
-                    <input
-                        id="email"
-                        type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="이메일 입력"
-                    />
-                </div>
+        <p className="text-center text-gray-600">
+          계정이 아직 없으신가요?{" "}
+          <a href="/signup" className="text-blue-500 hover:underline">
+            회원가입
+          </a>
+        </p>
 
-                {/* 패스워드 입력 */}
-                <div className="w-full">
-                    <label htmlFor="password" className="block text-gray-700 font-medium mb-2">
-                        패스워드
-                    </label>
-                    <input
-                        id="password"
-                        type="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="패스워드 입력"
-                    />
-                </div>
-                <button type="submit" className="w-full yellow">
-                    로그인
-                </button>
-            </form>
-        </div>
-    )
+        <GoogleButton> Google 계정으로 로그인</GoogleButton>
+      </form>
+    </div>
+  );
 }
