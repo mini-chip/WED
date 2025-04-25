@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import Logo from "@/images/logo.svg";
+import Sidebar from "../sidebar/page";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -42,61 +43,59 @@ export default function Navbar() {
   const handleMouseLeave = () => {
     setIsOpen(false);
   };
+
   return (
-    <nav className="flex justify-between items-center px-16 text-[#4f9e5b]">
-      {/* 햄버거 메뉴 */}
-      <div
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
-        className={`hamburger ${isOpen ? "open" : ""}`}
-        onClick={toggleMenu}
-      >
+    <>
+      <nav className="flex justify-between items-center px-16 text-[#4f9e5b] z-50">
         <div
-          className={` absolute w-full h-[3px] transition-all duration-300 ${
-            isOpen ? "rotate-45 translate-y-0" : "top-0"
-          }`}
-        />
-        <div
-          className={`absolute w-full h-[3px] transition-all duration-300 ${
-            isOpen ? "translate-x-1" : "top-1/2 -translate-y-1/2"
-          }`}
-        />
-        <div
-          className={` absolute w-full h-[3px] transition-all duration-300 ${
-            isOpen ? "-rotate-45 translate-y-0" : "bottom-0"
-          }`}
-        />
-      </div>
-      <div className="flex items-center">
-        <Logo width={100} height={100} />
-      </div>
-      {/* 
-      <div
-        className={`absolute top-16 right-16 bg-white shadow-lg rounded-lg p-4 transition-all duration-300 ${
-          isOpen ? "block" : "hidden"
-        }`}
-      > */}
-      {isLogin ? (
-        <div className="flex items-center space-x-4">
-          <span>{user?.email}</span> {/* 유저 이메일 표시 */}
-          <button className="group relative flex justify-center items-center rounded-[10px] bg-custom-green font-montserrat shadow-[0_6px_24px_0_rgba(0,0,0,0.2)] overflow-hidden cursor-pointer border-0">
-            <span className="text-center no-underline w-full px-[25px] py-2 bg-[#4f9e5b] text-white text-lg tracking-[0.3em] z-20 transition-all duration-300 ease-in-out group-hover:text-custom-green group-hover:animate-scaleUp">
+          className="relative w-[30px] h-[25px] cursor-pointer transition-all duration-300 ease-in-out"
+          onClick={toggleMenu}
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
+        >
+          <div
+            className={`absolute w-full h-[3px] bg-black transition-all duration-300 ease-in-out ${
+              isOpen ? "top-1/2 -translate-y-1/2 rotate-45" : "top-0"
+            }`}
+          />
+          <div
+            className={`absolute w-full h-[3px] bg-black transition-all duration-300 ease-in-out ${
+              isOpen ? "opacity-0" : "top-1/2 -translate-y-1/2"
+            }`}
+          />
+          <div
+            className={`absolute w-full h-[3px] bg-black transition-all duration-300 ease-in-out ${
+              isOpen ? "top-1/2 -translate-y-1/2 -rotate-45" : "bottom-0"
+            }`}
+          />
+        </div>
+
+        <div className="flex items-center">
+          <Logo width={100} height={100} />
+        </div>
+
+        {isLogin ? (
+          <div className="flex items-center space-x-4">
+            <span>{user?.email}</span>
+            <button
+              onClick={handleLogout}
+              className="rounded-2xl bg-green p-4 text-white"
+            >
               로그아웃
-            </span>
-            {/* <div className="w-0 h-full bg-custom-yellow absolute transition-all duration-400 ease-in-out right-0 group-hover:w-full group-hover:left-0 group-hover:right-auto"></div> */}
-          </button>
-        </div>
-      ) : (
-        <div className="flex items-center space-x-4">
-          <a href="/signin" className="hover:text-green-500">
-            로그인
-          </a>
-          <a href="/signup" className="hover:text-green-500">
-            회원가입
-          </a>
-        </div>
-      )}
-      {/* </div> */}
-    </nav>
+            </button>
+          </div>
+        ) : (
+          <div className="flex items-center space-x-4">
+            <a href="/signin" className="hover:text-green-500">
+              로그인
+            </a>
+            <a href="/signup" className="hover:text-green-500">
+              회원가입
+            </a>
+          </div>
+        )}
+      </nav>
+      <Sidebar isOpen={isOpen} setIsOpen={setIsOpen} />
+    </>
   );
 }
