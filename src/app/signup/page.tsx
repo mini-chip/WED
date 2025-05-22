@@ -8,13 +8,12 @@ import { supabase } from "@/lib/supabase";
 import Logo from "@/images/logo.svg";
 import Button from "@/app/component/buttons/page";
 import GoogleButton from "@/app/component/oauthButton/page";
-import { useEffect } from "react";
-import Image from "next/image";
+import { useState, useEffect } from "react";
 
 const signupSchema = z
   .object({
     email: z.string().email("유효한 이메일을 입력해주세요."),
-    username: z.string().min(3, "아이디는 최소 3자 이상이어야 합니다."),
+    userId: z.string().min(2, "아이디는 최소 2자 이상이어야 합니다."),
     password: z.string().min(6, "비밀번호는 최소 6자 이상이어야 합니다."),
     confirmPassword: z.string(),
     nickname: z.string().min(2, "닉네임은 최소 2자 이상이어야 합니다.")
@@ -48,12 +47,12 @@ export default function SignUpPage() {
   }, [router]);
   const onSubmit = async (data: SignupFormData) => {
     try {
-      const { email, username, password, nickname } = data;
-      const { data: userData, error } = await supabase.auth.signUp({
+      const { email, userId, password, nickname } = data;
+      const { data: authData, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          data: { username, nickname }
+          data: { userId, nickname }
         }
       });
 
@@ -63,7 +62,22 @@ export default function SignUpPage() {
         return;
       }
 
-      console.log("회원가입 성공:", userData);
+      const userIdFromAuth = authData.user?.id;
+      if (userIdFromAuth) {
+        const { error: dbError } = await supabase.from("users").insert({
+          id: userIdFromAuth,
+          email,
+          userId,
+          nickname
+        });
+
+        if (dbError) {
+          console.error("데이터베이스 저장 에러:", dbError.message);
+          alert("사용자 정보 저장에 실패했습니다.");
+          return;
+        }
+      }
+      console.log("회원가입 성공:", authData);
       alert("회원가입이 완료되었습니다!");
       router.push("/");
     } catch (err) {
@@ -83,10 +97,21 @@ export default function SignUpPage() {
           type="email"
           placeholder="이메일"
           {...register("email")}
-          className="p-2  border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
+          className="p-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
         />
         {errors.email && (
           <p className="text-red-500 text-sm">{errors.email.message}</p>
+        )}
+
+        <input
+          type="text"
+          placeholder="아이디"
+          {...register("userId")}
+          className="p-2  border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
+          required
+        />
+        {errors.userId && (
+          <p className="text-red-500 text-sm">{errors.userId.message}</p>
         )}
 
         <input

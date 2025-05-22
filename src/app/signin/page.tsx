@@ -40,7 +40,7 @@ export default function SignUpPage() {
         className="flex flex-col gap-3 w-full max-w-xs"
       >
         <input
-          type="email"
+          type="Email"
           placeholder="이메일"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
