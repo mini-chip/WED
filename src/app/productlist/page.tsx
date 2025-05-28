@@ -1,9 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
 import { getProductList } from "@/api/getProductAPI";
-import { Link, useNavigate } from "react-router-dom";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-
 export default function ProductList() {
   const [productList, setProductList] = useState([]);
   const [sortOrder, setSortOrder] = useState("reviewOrder");
@@ -38,29 +37,10 @@ export default function ProductList() {
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-3xl font-bold mb-4">상품 목록</h1>
-      <div className="flex justify-between items-center mb-4">
-        <div className="flex items-center">
-          <label htmlFor="sort" className="mr-2">
-            정렬 기준:
-          </label>
-          <select
-            id="sort"
-            className="border border-gray-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-500"
-            value={sortOrder}
-            onChange={handleSelected}
-          >
-            <option value="reviewOrder">평점순</option>
-            <option value="descendingOrder">높은 가격순</option>
-          </select>
-        </div>
-        <Link to="/cart" className="text-blue-500 hover:underline">
-          장바구니로 이동
-        </Link>
-      </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {sortProducts(productList, sortOrder).map((product: any) => (
           <div key={product.id} className="border rounded-lg shadow-md p-4">
-            <Link to={`/products/${product.id}`}>
+            <Link href={`/products/${product.id}`}>
               <img
                 src={product.image}
                 alt={product.title}
