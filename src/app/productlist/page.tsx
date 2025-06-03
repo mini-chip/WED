@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { getProductList } from "@/api/getProductAPI";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import OutfitMapperPage from "@/app/utils/outfitMapper/page";
 export default function ProductList() {
   const [productList, setProductList] = useState([]);
   const [sortOrder, setSortOrder] = useState("reviewOrder");
@@ -36,8 +37,7 @@ export default function ProductList() {
 
   return (
     <div className="container mx-auto p-4">
-      <h1 className="text-3xl font-bold mb-4">상품 목록</h1>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      {/* <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {sortProducts(productList, sortOrder).map((product: any) => (
           <div key={product.id} className="border rounded-lg shadow-md p-4">
             <Link href={`/products/${product.id}`}>
@@ -51,7 +51,8 @@ export default function ProductList() {
             </Link>
           </div>
         ))}
-      </div>
+      </div> */}
+      <OutfitMapperPage />
     </div>
   );
 }
