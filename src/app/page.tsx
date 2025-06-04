@@ -7,8 +7,6 @@ export default function Home() {
     <div>
       <Navbar />
       <ProductList />
-
-      <h1 className="font-semibold">Welcome to WED</h1>
     </div>
   );
 }

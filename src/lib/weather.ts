@@ -1,7 +1,6 @@
 import axios from "axios";
-
+import { useState } from "react";
 const apiKey = process.env.NEXT_PUBLIC_WEATHER_API_KEY;
-if (!apiKey) throw new Error("Weather API key is missing");
 
 /**
 
@@ -15,9 +14,10 @@ export async function getWeather(city: string) {
     const response = await axios.get(url);
     const data = response.data;
     return {
+      city: data.name, // 도시 이름
       temperature: data.main.temp, // 현재 기온 (섭씨)
       description: data.weather[0].description, // 날씨 설명
-      icon: `https://openweathermap.org/img/wn/${data.weather[0].icon}.png`, // 날씨 아이콘
+      icon: `https://openweathermap.org/img/wn/${data.weather[0].icon}.png` // 날씨 아이콘
     };
   } catch (error) {
     console.error("Error fetching weather:", error);
@@ -38,9 +38,10 @@ export async function getWeatherByCoords(lat: number, lon: number) {
     const response = await axios.get(url);
     const data = response.data;
     return {
-      temperature: data.main.temp,
+      city: data.name,
+      temperature: Math.round(data.main.temp),
       description: data.weather[0].description,
-      icon: `https://openweathermap.org/img/wn/${data.weather[0].icon}.png`,
+      icon: `https://openweathermap.org/img/wn/${data.weather[0].icon}.png`
     };
   } catch (error) {
     console.error("Error fetching weather:", error);
