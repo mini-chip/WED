@@ -18,7 +18,12 @@ const outfitRecommendations: Record<string, string[]> = {
     "Ankle boots",
     "Beanie"
   ],
-  spring: ["Light sweater", "Cardigan", "Chinos", "Sneakers", "Light scarf"],
+  spring: [
+    "얇은 스웨터 또는 맨투맨",
+    "가디건",
+    "청바지 또는 면바지",
+    "스니커즈"
+  ],
   summer: ["T-shirt", "Shorts", "Sandals", "Sunglasses", "Cap"],
   casual: ["Comfortable jeans", "Casual shirt or blouse", "Sneakers or loafers"]
 };
@@ -134,36 +139,43 @@ export default function OutfitMapperPage() {
   }, [city]); // city가 변경될 때마다 데이터를 다시 가져옴
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">오늘의 옷차림 추천</h1>
-      <p className="mb-2">현재 도시: {city}</p>
-      <p className="mb-2">
-        현재 기온: {weather ? `${weather.temperature}°C` : "정보 없음"}
-      </p>
+    <div className="flex justify-center items-center  text-black relative w-[480px] h-[400px] transition-transform duration-300 transform-style-preserve-3d hover:rotate-y-180">
+      <div className="inline-block text-black perspective-1000">
+        <div className="absolute w-full h-full backface-hidden rounded-lg p-3 bg-gradient-to-r from-[rgb(183,255,177)] to-[rgb(200,245,138)]">
+          <h1 className="text-2xl font-bold mb-4">오늘의 옷차림 추천</h1>
+          <p className="mb-2">현재 도시: {city}</p>
+          <p className="mb-2">
+            현재 기온: {weather ? `${weather.temperature}°C` : "정보 없음"}
+          </p>
 
-      {loading ? (
-        <p>로딩 중...</p>
-      ) : (
-        <>
-          <p className="mb-2">추천 옷차림:</p>
-          {recommendations.length > 0 ? (
-            <ul className="list-disc pl-5">
-              {recommendations.map((item, index) => (
-                <li key={index} className="mb-1">
-                  {item}
-                </li>
-              ))}
-            </ul>
+          {loading ? (
+            <p>로딩 중...</p>
           ) : (
-            <p>옷차림 추천 정보를 불러오지 못했습니다.</p>
+            <>
+              <p className="mb-2">추천 옷차림:</p>
+              {recommendations.length > 0 ? (
+                <ul className="list-disc pl-5">
+                  {recommendations.map((item, index) => (
+                    <li key={index} className="mb-1">
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p>옷차림 추천 정보를 불러오지 못했습니다.</p>
+              )}
+            </>
           )}
-        </>
-      )}
 
-      <p className="mt-4 text-gray-600">
-        위의 추천은 현재 날씨와 계절에 따라 달라질 수 있습니다. 항상 날씨를
-        확인하고 적절한 옷차림을 선택하세요!
-      </p>
+          <p className="mt-4 text-gray-600">
+            위의 추천은 현재 날씨와 계절에 따라 달라질 수 있습니다. 항상 날씨를
+            확인하고 적절한 옷차림을 선택하세요!
+          </p>
+        </div>
+        <div className="absolute w-full h-full backface-hidden rotate-y-180 rounded-lg p-3 bg-gradient-to-r from-[rgb(200,245,138)] to-[rgb(183,255,177)]">
+          <h2 className="text-xl font-bold mb-4">PlayList 추천</h2>
+        </div>
+      </div>
     </div>
   );
 }
