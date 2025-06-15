@@ -49,7 +49,7 @@ export default function Navbar() {
   return (
     <nav className="flex justify-between items-center px-16 text-[#4f9e5b]">
       <div
-        className="relative w-[30px] h-[25px] cursor-pointer transition-all duration-300 ease-in-out"
+        className="relative z-10 w-[30px] h-[25px] cursor-pointer transition-all duration-300 ease-in-out"
         onClick={toggleMenu}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
@@ -71,7 +71,7 @@ export default function Navbar() {
         />
       </div>
 
-      <div className="flex items-center">
+      <div className="flex z-0 absolute px-6 items-center">
         <Logo width={100} height={100} />
       </div>
 
