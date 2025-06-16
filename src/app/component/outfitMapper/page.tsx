@@ -1,13 +1,21 @@
 "use client";
 import { useEffect, useState } from "react";
-import {
-  getMultiDayWeather,
-  getMultiDayWeatherByCoords,
-  WeatherData
-} from "@/lib/weather";
+import { getMultiDayWeather } from "@/lib/weather";
 import { WeatherIcon } from "../weathericon/page";
 import { MapPin, Thermometer, Droplets, Wind, Music } from "lucide-react";
 import { LoadingSpinner } from "../loadingSpinner/page";
+
+// WeatherData 타입 정의
+interface WeatherData {
+  city: string;
+  country: string;
+  date: string;
+  dayName: string;
+  description: string;
+  humidity: number;
+  temperature: number;
+  windSpeed: number;
+}
 
 const outfitRecommendations: Record<string, string[]> = {
   winter: [
@@ -92,115 +100,7 @@ const playlistRecommendations: Record<
     ]
   }
 };
-async function getOutfitRecommendations(city: string) {
-  const weatherData = await getWeather(city);
-  
-  if (!weatherData) {
-  throw new Error("Failed to fetch weather data");
-  }
-  
-  const { temperature, description } = weatherData;
-  
-  let outfitType = "casual"; // 기본값
-  
-  if (temperature < 0) {
-  outfitType = "winter";
-  } else if (temperature >= 0 && temperature < 15) {
-  outfitType = "autumn";
-  } else if (temperature >= 15 && temperature < 25) {
-  outfitType = "spring";
-  } else if (temperature >= 25) {
-  outfitType = "summer";
-  }
-  
-  // 날씨 설명에 따라 추가적인 추천
-  if (description.includes("rain")) {
-  outfitType = "casual"; // 비 오는 날은 캐주얼 추천
-  } else if (description.includes("snow")) {
-  outfitType = "winter"; // 눈 오는 날은 겨울 옷 추천
-  }
-  
-  return outfitRecommendations[outfitType];
-  }
-  
-  export default function OutfitMapperPage() {
-  const [recommendations, setRecommendations] = useState<string[]>([]);
-  const [weather, setWeather] = useState<any>(null); // 날씨 정보 저장
-  const [city, setCity] = useState("Seoul"); // 초기값
-  const [loading, setLoading] = useState(true);
-  
-  useEffect(() => {
-  async function fetchWeather() {
-  setLoading(true);
-  try {
-  if (navigator.geolocation) {
-  navigator.geolocation.getCurrentPosition(
-  async (position) => {
-  const { latitude, longitude } = position.coords;
-  const weatherData = await getWeatherByCoords(latitude, longitude);
-  if (weatherData) {
-  setCity(weatherData.city); // 현재 위치의 도시 이름 설정
-  setWeather(weatherData);
-  setRecommendations(
-  await getOutfitRecommendations(weatherData.city)
-  );
-  } else {
-  console.error("날씨 데이터를 가져오는 데 실패했습니다.");
-  setRecommendations([]);
-  }
-  },
-  (error) => {
-  console.error("위치 정보를 가져오는 데 실패했습니다:", error);
-  setRecommendations([]);
-  fetchWeatherForCity("Seoul");
-  }
-  );
-  } else {
-  console.error("위치 지원이 불가합니다. Seoul로 설정됩니다.");
-  fetchWeatherForCity("Seoul");
-  }
-  } catch (error) {
-  console.error("날씨 정보를 가져오는 중 오류 발생:", error);
-  setRecommendations([]);
-  } finally {
-  setLoading(false);
-  }
-  }
-  async function fetchWeatherForCity(city: string) {
-  try {
-  const weatherData = await getWeather(city);
-  if (weatherData) {
-  setCity(weatherData.city);
-  setWeather(weatherData);
-  setRecommendations(await getOutfitRecommendations(weatherData.city));
-  } else {
-  console.error("날씨 데이터를 가져오는 데 실패했습니다.");
-  setRecommendations([]);
-  }
-  } catch (error) {
-  console.error("날씨 정보를 가져오는 중 오류 발생:", error);
-  setRecommendations([]);
-  }
-  }
-  fetchWeather();
-  }, []);
-  useEffect(() => {
-  async function fetchOutfitRecommendations() {
-  setLoading(true);
-  try {
-  const outfit = await getOutfitRecommendations(city);
-  setRecommendations(outfit);
-  } catch (error) {
-  console.error("Error fetching outfit recommendations:", error);
-  setRecommendations([]);
-  } finally {
-  setLoading(false);
-  }
-  }
-  
-  
-  fetchOutfitRecommendations();
-  }, [city]);
+
 function getOutfitCategory(temperature: number, description: string): string {
   if (temperature < 0) return "winter";
   if (temperature < 10) return "cold";
@@ -249,202 +149,107 @@ export default function OutfitMapperPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isFlipped, setIsFlipped] = useState(false);
-  const [city, setCity] = useState("Seoul");
-  const [weather, setWeather] = useState<WeatherData | null>(null);
-  const [recommendations, setRecommendations] = useState<string[]>([]);
-  const currentWeather = weatherData[selectedDayIndex];
+
   useEffect(() => {
     async function fetchWeather() {
       setLoading(true);
+      setError(null);
       try {
         if (navigator.geolocation) {
           navigator.geolocation.getCurrentPosition(
             async (position) => {
               const { latitude, longitude } = position.coords;
-              const weatherData = await getWeatherByCoords(latitude, longitude);
-              if (weatherData) {
-                setCity(weatherData.city); // 현재 위치의 도시 이름 설정
-                setWeather(weatherData);
-                setRecommendations(
-                  await getOutfitRecommendations(weatherData.city)
-                );
+              const data = await getMultiDayWeather({
+                lat: latitude,
+                lon: longitude
+              });
+              if (data && data.length > 0) {
+                setWeatherData(data);
               } else {
-                console.error("날씨 데이터를 가져오는 데 실패했습니다.");
-                setRecommendations([]);
+                throw new Error("날씨 데이터를 가져오는데 실패했습니다");
               }
             },
-            (error) => {
-              console.error("위치 정보를 가져오는 데 실패했습니다:", error);
-              setRecommendations([]);
-              fetchWeatherForCity("Seoul");
-            }
+            async (geoError) => {
+              console.error("Geolocation 오류:", geoError.message);
+              // Fallback to Seoul if geolocation fails
+              const data = await getMultiDayWeather({ city: "Seoul" });
+              if (data && data.length > 0) {
+                setWeatherData(data);
+              } else {
+                throw new Error("날씨 데이터를 가져오는데 실패했습니다");
+              }
+            },
+            { timeout: 10000 } // 타임아웃 추가
           );
         } else {
-          console.error("위치 지원이 불가합니다. Seoul로 설정됩니다.");
-          fetchWeatherForCity("Seoul");
+          const data = await getMultiDayWeather({ city: "Seoul" });
+          if (data && data.length > 0) {
+            setWeatherData(data);
+          } else {
+            throw new Error("날씨 데이터를 가져오는데 실패했습니다");
+          }
         }
-      } catch (error) {
-        console.error("날씨 정보를 가져오는 중 오류 발생:", error);
-        setRecommendations([]);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "오류가 발생했습니다");
       } finally {
         setLoading(false);
       }
     }
-    // useEffect(() => {
-    //   let watchId: number;
-    //   const timeoutId = setTimeout(() => {
-    //     if (loading) {
-    //       setError("로딩 시간이 초과되었습니다.");
-    //       setLoading(false);
-    //     }
-    //   }, 10000); // 10초 타임아웃
 
-    //   const fetchWeather = () => {
-    //     if (!navigator.geolocation) {
-    //       setError("위치 정보를 지원하지 않는 브라우저입니다.");
-    //       fallbackToSeoul();
-    //       return;
-    //     }
-
-    //     watchId = navigator.geolocation.getCurrentPosition(
-    //       async (position) => {
-    //         const { latitude, longitude } = position.coords;
-    //         try {
-    //           const data = await getMultiDayWeatherByCoords(latitude, longitude);
-    //           if (!data || data.length === 0) {
-    //             throw new Error("날씨 데이터를 가져오지 못했습니다.");
-    //           }
-    //           setWeatherData(data);
-    //           setError(null);
-    //         } catch (err) {
-    //           setError(
-    //             err instanceof Error
-    //               ? err.message
-    //               : "날씨 데이터를 가져오는 중 오류가 발생했습니다."
-    //           );
-    //           fallbackToSeoul();
-    //         } finally {
-    //           setLoading(false);
-    //           clearTimeout(timeoutId);
-    //         }
-    //       },
-    //       (err) => {
-    //         setError(`위치 정보 오류: ${err.message}`);
-    //         fallbackToSeoul();
-    //       },
-    //       { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-    //     );
-    //   };
-
-  //   const fallbackToSeoul = async () => {
-  //     try {
-  //       const data = await getMultiDayWeather("Seoul");
-  //       setWeatherData(data);
-  //       setError("기본 위치(서울)로 날씨를 표시합니다.");
-  //     } catch (err) {
-  //       setError("서울 날씨를 가져오는 데 실패했습니다.");
-  //     } finally {
-  //       setLoading(false);
-  //       clearTimeout(timeoutId);
-  //     }
-  //   };
-
-  //   fetchWeather();
-
-  //   return () => {
-  //     if (watchId !== undefined) {
-  //       navigator.geolocation.clearWatch(watchId);
-  //     }
-  //     clearTimeout(timeoutId);
-  //   };
-  // }, []);
-
-  // const currentWeather = weatherData[selectedDayIndex];
-  // const outfitCategory = currentWeather
-  //   ? getOutfitCategory(currentWeather.temperature, currentWeather.description)
-  //   : "mild";
-  // const playlistCategory = currentWeather
-  //   ? getPlaylistCategory(
-  //       currentWeather.temperature,
-  //       currentWeather.description
-  //     )
-  //   : "sunny";
-  // const gradientClass = currentWeather
-  //   ? getGradientByWeather(
-  //       currentWeather.description,
-  //       currentWeather.temperature
-  //     )
-  //   : "from-green-200 via-emerald-300 to-teal-400";
-
-  // const handleDayClick = (index: number) => {
-  //   setSelectedDayIndex(index);
-  //   setIsFlipped(false);
-  // };
-  // console.log(weatherData);
-  // if (loading) {
-  //   return (
-  //     <div className="min-h-screen bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center">
-  //       <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-xl">
-  //         <LoadingSpinner size="lg" color="text-blue-600" />
-  //         <p className="mt-4 text-gray-600 text-center">
-  //           날씨 정보를 가져오는 중...
-  //         </p>
-  //       </div>
-  //     </div>
-  //   );
-  // }
-
-  // if (error) {
-  //   return (
-  //     <div className="min-h-screen bg-gradient-to-br from-red-100 to-pink-100 flex items-center justify-center">
-  //       <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-xl text-center">
-  //         <p className="text-red-600 mb-4">오류: {error}</p>
-  //         <button
-  //           onClick={() => window.location.reload()}
-  //           className="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
-  //         >
-  //           다시 시도
-  //         </button>
-  //       </div>
-  //     </div>
-  //   );
-  // }
-
-  async function fetchWeatherForCity(city: string) {
-    try {
-    const weatherData = await getWeather(city);
-    if (weatherData) {
-    setCity(weatherData.city);
-    setWeather(weatherData);
-    setRecommendations(await getOutfitRecommendations(weatherData.city));
-    } else {
-    console.error("날씨 데이터를 가져오는 데 실패했습니다.");
-    setRecommendations([]);
-    }
-    } catch (error) {
-    console.error("날씨 정보를 가져오는 중 오류 발생:", error);
-    setRecommendations([]);
-    }
-    }
     fetchWeather();
-    }, []);
-    useEffect(() => {
-    async function fetchOutfitRecommendations() {
-    setLoading(true);
-    try {
-    const outfit = await getOutfitRecommendations(city);
-    setRecommendations(outfit);
-    } catch (error) {
-    console.error("Error fetching outfit recommendations:", error);
-    setRecommendations([]);
-    } finally {
-    setLoading(false);
-    }
-    }
-    
-    
-    fetchOutfitRecommendations();
-    }, [city]);
+  }, []);
+
+  const currentWeather = weatherData[selectedDayIndex];
+  const outfitCategory = currentWeather
+    ? getOutfitCategory(currentWeather.temperature, currentWeather.description)
+    : "mild";
+  const playlistCategory = currentWeather
+    ? getPlaylistCategory(
+        currentWeather.temperature,
+        currentWeather.description
+      )
+    : "sunny";
+  const gradientClass = currentWeather
+    ? getGradientByWeather(
+        currentWeather.description,
+        currentWeather.temperature
+      )
+    : "from-green-200 via-emerald-300 to-teal-400";
+
+  const handleDayClick = (index: number) => {
+    setSelectedDayIndex(index);
+    setIsFlipped(false); // Reset to outfit view when switching days
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center">
+        <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-xl">
+          <LoadingSpinner size="lg" color="text-blue-600" />
+          <p className="mt-4 text-gray-600 text-center">
+            날씨 정보를 가져오는 중...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-red-100 to-pink-100 flex items-center justify-center">
+        <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-xl text-center">
+          <p className="text-red-600 mb-4">오류: {error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+          >
+            다시 시도
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div
       className={`min-h-screen bg-gradient-to-br ${gradientClass} flex items-center justify-center p-4`}
@@ -470,7 +275,6 @@ export default function OutfitMapperPage() {
                       <WeatherIcon
                         condition={currentWeather?.description || "sunny"}
                         size={32}
-                        aria-label={currentWeather?.description || "맑음"}
                       />
                     </div>
                   </div>
@@ -478,7 +282,7 @@ export default function OutfitMapperPage() {
                   {currentWeather && (
                     <div className="space-y-4 mb-6">
                       <div className="flex items-center text-gray-600">
-                        <MapPin size={16} className="mr-2" aria-label="위치" />
+                        <MapPin size={16} className="mr-2" />
                         <span className="text-sm">
                           {currentWeather.city}, {currentWeather.country}
                         </span>
@@ -500,7 +304,6 @@ export default function OutfitMapperPage() {
                             className={`mx-auto mb-1 ${getTemperatureColor(
                               currentWeather.temperature
                             )}`}
-                            aria-label="기온"
                           />
                           <p
                             className={`text-lg font-semibold ${getTemperatureColor(
@@ -516,7 +319,6 @@ export default function OutfitMapperPage() {
                           <Droplets
                             size={16}
                             className="mx-auto mb-1 text-blue-500"
-                            aria-label="습도"
                           />
                           <p className="text-lg font-semibold text-blue-600">
                             {currentWeather.humidity}%
@@ -528,7 +330,6 @@ export default function OutfitMapperPage() {
                           <Wind
                             size={16}
                             className="mx-auto mb-1 text-gray-500"
-                            aria-label="바람"
                           />
                           <p className="text-lg font-semibold text-gray-600">
                             {currentWeather.windSpeed}km/h
@@ -570,14 +371,13 @@ export default function OutfitMapperPage() {
                 <div className="h-full flex flex-col">
                   <div className="flex items-center justify-between mb-6">
                     <h2 className="text-2xl font-bold text-gray-800 flex items-center">
-                      <Music className="mr-2" size={24} aria-label="음악" />
+                      <Music className="mr-2" size={24} />
                       플레이리스트
                     </h2>
                     <div className="text-right">
                       <WeatherIcon
                         condition={currentWeather?.description || "sunny"}
                         size={32}
-                        aria-label={currentWeather?.description || "맑음"}
                       />
                     </div>
                   </div>
@@ -627,7 +427,6 @@ export default function OutfitMapperPage() {
           {weatherData.map((weather, index) => {
             if (index === selectedDayIndex) return null; // Don't show the selected day in the side cards
 
-            const isActive = index === selectedDayIndex;
             const cardGradient = getGradientByWeather(
               weather.description,
               weather.temperature
@@ -636,11 +435,7 @@ export default function OutfitMapperPage() {
             return (
               <div
                 key={index}
-                className={`transition-all duration-500 cursor-pointer transform hover:scale-105 ${
-                  isActive
-                    ? "scale-100 opacity-100"
-                    : "scale-75 opacity-60 hover:opacity-80"
-                }`}
+                className="transition-all duration-500 cursor-pointer transform hover:scale-105 scale-75 opacity-60 hover:opacity-80"
                 onClick={() => handleDayClick(index)}
               >
                 <div
@@ -655,11 +450,7 @@ export default function OutfitMapperPage() {
                     </div>
 
                     <div className="flex justify-center mb-4">
-                      <WeatherIcon
-                        condition={weather.description}
-                        size={40}
-                        aria-label={weather.description}
-                      />
+                      <WeatherIcon condition={weather.description} size={40} />
                     </div>
 
                     <div className="text-center mb-4">
@@ -680,7 +471,6 @@ export default function OutfitMapperPage() {
                         <Droplets
                           size={14}
                           className="mx-auto mb-1 text-blue-500"
-                          aria-label="습도"
                         />
                         <p className="text-sm font-semibold text-blue-600">
                           {weather.humidity}%
@@ -691,7 +481,6 @@ export default function OutfitMapperPage() {
                         <Wind
                           size={14}
                           className="mx-auto mb-1 text-gray-500"
-                          aria-label="바람"
                         />
                         <p className="text-sm font-semibold text-gray-600">
                           {weather.windSpeed}km/h
@@ -714,7 +503,7 @@ export default function OutfitMapperPage() {
 
       <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2">
         <p className="text-white/80 text-sm text-center">
-          날씨 기반 추천 서비스 • 실시간 업데이트
+          날씨 기반 추천 서비스
         </p>
       </div>
     </div>
