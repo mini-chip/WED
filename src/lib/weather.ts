@@ -2,6 +2,7 @@ import axios from "axios";
 
 const apiKey = process.env.NEXT_PUBLIC_WEATHER_API_KEY;
 
+// 날씨 데이터 인터페이스
 export interface WeatherData {
   city: string;
   country: string;
@@ -14,7 +15,15 @@ export interface WeatherData {
   dayName: string;
 }
 
-// 한국어 요일 및 날짜 포맷팅 함수
+// 날씨 요청 파라미터 인터페이스
+interface WeatherParams {
+  city?: string;
+  lat?: number;
+  lon?: number;
+  lang?: string;
+}
+
+// 한국어 날짜 및 요일 포맷팅 함수
 function formatKoreanDate(dateOffset: number = 0): {
   date: string;
   dayName: string;
@@ -40,22 +49,19 @@ function formatKoreanDate(dateOffset: number = 0): {
   return { date, dayName };
 }
 
-// 통합된 현재 날씨 데이터 함수
+// 현재 날씨 데이터 가져오기 함수
 export async function getCurrentWeather({
   city,
   lat,
-  lon
-}: {
-  city?: string;
-  lat?: number;
-  lon?: number;
-}) {
+  lon,
+  lang = "ko" // 기본값 한국어
+}: WeatherParams) {
   let url: string;
 
   if (city) {
-    url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${apiKey}`;
+    url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&lang=${lang}&appid=${apiKey}`;
   } else if (lat && lon) {
-    url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${apiKey}`;
+    url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&lang=${lang}&appid=${apiKey}`;
   } else {
     throw new Error("도시 이름 또는 좌표를 제공해야 합니다.");
   }
@@ -70,27 +76,24 @@ export async function getCurrentWeather({
       icon: `https://openweathermap.org/img/wn/${data.weather[0].icon}.png`
     };
   } catch (error) {
-    console.error("Error fetching weather:", error);
+    console.error("현재 날씨 데이터를 가져오는 중 오류 발생:", error);
     return null;
   }
 }
 
-// 5일 예보 데이터 함수
+// 5일 예보 데이터 가져오기 함수
 export async function getMultiDayWeather({
   city,
   lat,
-  lon
-}: {
-  city?: string;
-  lat?: number;
-  lon?: number;
-}): Promise<WeatherData[]> {
+  lon,
+  lang = "ko" // 기본값 한국어
+}: WeatherParams): Promise<WeatherData[]> {
   let url: string;
 
   if (city) {
-    url = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&units=metric&appid=${apiKey}`;
+    url = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&units=metric&lang=${lang}&appid=${apiKey}`;
   } else if (lat && lon) {
-    url = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&units=metric&appid=${apiKey}`;
+    url = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&units=metric&lang=${lang}&appid=${apiKey}`;
   } else {
     throw new Error("도시 이름 또는 좌표를 제공해야 합니다.");
   }
@@ -99,7 +102,7 @@ export async function getMultiDayWeather({
     const response = await axios.get(url);
     const data = response.data;
 
-    // 5일 예보 데이터에서 매일 12:00:00 데이터만 추출 (3일치로 제한)
+    // 5일 예보 데이터에서 매일 12:00:00 데이터만 추출 (최대 5일)
     const dailyData = data.list
       .filter((item: any) => item.dt_txt.includes("12:00:00"))
       .slice(0, 5);
@@ -135,7 +138,7 @@ export async function getMultiDayWeather({
 
     return weatherData;
   } catch (error) {
-    console.error("Error fetching multi-day weather:", error);
+    console.error("5일 예보 데이터를 가져오는 중 오류 발생:", error);
     return [];
   }
 }
