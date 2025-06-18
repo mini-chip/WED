@@ -231,8 +231,13 @@ function getGradientByWeather(
   description: string,
   temperature: number
 ): string {
+  if (!description || temperature === undefined) {
+    return "from-gray-200 via-gray-300 to-gray-400"; // 기본 그라디언트
+  }
   if (description.includes("rain"))
     return "from-slate-400 via-blue-500 to-slate-600";
+  if (description.includes("snow"))
+    return "from-white via-gray-100 to-blue-200";
   if (temperature < 5) return "from-blue-200 via-blue-300 to-indigo-400";
   if (temperature < 15) return "from-emerald-200 via-teal-300 to-cyan-400";
   if (temperature < 25) return "from-green-200 via-emerald-300 to-teal-400";
@@ -394,7 +399,7 @@ export default function OutfitMapperPage() {
   const toggleLanguage = () => {
     setLanguage((prev) => (prev === "ko" ? "en" : "ko"));
   };
-
+  console.log("displayWeather", displayWeather);
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center">

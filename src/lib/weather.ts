@@ -54,7 +54,7 @@ export async function getCurrentWeather({
   city,
   lat,
   lon,
-  lang = "ko" // 기본값 한국어
+  lang
 }: WeatherParams) {
   let url: string;
 
@@ -81,12 +81,11 @@ export async function getCurrentWeather({
   }
 }
 
-// 5일 예보 데이터 가져오기 함수
 export async function getMultiDayWeather({
   city,
   lat,
   lon,
-  lang = "ko" // 기본값 한국어
+  lang
 }: WeatherParams): Promise<WeatherData[]> {
   let url: string;
 
@@ -102,7 +101,6 @@ export async function getMultiDayWeather({
     const response = await axios.get(url);
     const data = response.data;
 
-    // 5일 예보 데이터에서 매일 12:00:00 데이터만 추출 (최대 5일)
     const dailyData = data.list
       .filter((item: any) => item.dt_txt.includes("12:00:00"))
       .slice(0, 5);
