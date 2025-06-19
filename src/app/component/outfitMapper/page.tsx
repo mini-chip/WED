@@ -10,7 +10,7 @@ import {
   Music,
   Clock
 } from "lucide-react";
-import { LoadingSpinner } from "../loadingSpinner/page";
+import { LoadingSpinner } from "../LoadingSpinner";
 
 // WeatherData 타입 정의
 interface WeatherData {
