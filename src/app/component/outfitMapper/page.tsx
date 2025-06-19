@@ -32,7 +32,6 @@ interface CurrentWeatherData {
   icon: string;
 }
 
-// 한국어 추천 데이터
 const outfitRecommendationsKo: Record<string, string[]> = {
   winter: [
     "두꺼운 패딩이나 코트",
