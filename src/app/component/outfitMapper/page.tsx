@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { getCurrentWeather, getMultiDayWeather } from "@/lib/weather";
-import { WeatherIcon } from "../weathericon/page";
+import { WeatherIcon } from "../WeatherIcon";
 import {
   MapPin,
   Thermometer,

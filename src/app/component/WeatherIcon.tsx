@@ -1,5 +1,5 @@
 "useclient";
-
+import React from "react";
 import { Sun, Cloud, CloudRain, CloudSnow, CloudDrizzle } from "lucide-react";
 
 interface WeatherIconProps {
