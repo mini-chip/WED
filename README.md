@@ -13,7 +13,7 @@
 - 다국어 지원 (한국어/영어)
 
 ## 🌈 배포
-🔗[WED](https://wed-656iuykk7-minhees-projects-3eff1d38.vercel.app))☀️
+🔗[WED](https://wed-656iuykk7-minhees-projects-3eff1d38.vercel.app)☀️
 
 ## ⚡️ 스택
 ![Git](https://img.shields.io/badge/Git-f05032.svg?&style=for-the-badge&logo=Git&logoColor=white)
