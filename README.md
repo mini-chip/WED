@@ -1,4 +1,5 @@
 # WED(Weather EveryDay)🌞
+![image](https://github.com/user-attachments/assets/e2761f96-6c97-42b2-97fa-11482e0f64f1)
 
 ## 💨 프로젝트 배경
 출근 전이나 약속 전에 "오늘 뭘 입어야 할까?"라는 고민을 매번 하게 되었습니다. 
@@ -13,7 +14,7 @@
 - 다국어 지원 (한국어/영어)
 
 ## 🌈 배포
-🔗[WED](https://wed-656iuykk7-minhees-projects-3eff1d38.vercel.app)☀️
+🔗[WED](https://wed-arsy-6z3u6meae-minhees-projects-3eff1d38.vercel.app)☀️
 
 ## ⚡️ 스택
 ![Git](https://img.shields.io/badge/Git-f05032.svg?&style=for-the-badge&logo=Git&logoColor=white)
