@@ -47,6 +47,18 @@ body {
   padding: 0 1rem;
 }
 
+@media (min-width: 640px) {
+  .container {
+    padding: 0 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container {
+    padding: 0 2rem;
+  }
+}
+
 footer {
   margin-top: auto;
   background-color: #343a40;
@@ -77,4 +89,42 @@ textarea {
   font-size: 1rem;
   border: 1px solid #ccc;
   border-radius: 1rem;
+}
+
+@media (min-width: 640px) {
+  input,
+  select,
+  textarea {
+    padding: 0.75rem;
+    font-size: 1.1rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  input,
+  select,
+  textarea {
+    padding: 1rem;
+    font-size: 1.2rem;
+  }
+}
+
+/* 스크롤바 스타일링 */
+.scrollbar-style::-webkit-scrollbar {
+  height: 8px;
+}
+
+.scrollbar-style::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
+.scrollbar-style::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+  transition: background 0.3s ease;
+}
+
+.scrollbar-style::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5);
 }
